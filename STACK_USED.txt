@@ -1,0 +1,40 @@
+IMS Scanner App - Stack Used
+Updated: 2026-03-01
+
+Core Platform
+- Flutter + Dart (implemented)
+- Material UI with custom theme files (implemented)
+- Android-first mobile target (implemented)
+
+Navigation and State
+- go_router (implemented in app router)
+- flutter_riverpod (implemented for app scope and UI state)
+- riverpod_annotation + riverpod_generator (installed, not yet used)
+
+Networking
+- dio (implemented via `lib/utils/http/http_client.dart`)
+- Base URL network config screen (implemented as UI, persistence/integration pending)
+
+Storage and Offline
+- drift + drift_flutter + sqlite3_flutter_libs (installed, not wired yet)
+- drift_dev (dev dependency, not used yet)
+- connectivity_plus (installed, not wired yet)
+
+Security and Monitoring
+- flutter_secure_storage (installed, not wired yet)
+- sentry_flutter (installed, not initialized yet)
+- logger (implemented for local logging)
+
+Models and Code Generation
+- freezed_annotation + json_annotation (installed, not used yet)
+- freezed + json_serializable + build_runner (dev dependencies, not used yet)
+
+UI and Utilities
+- iconsax (implemented)
+- carousel_slider (implemented in home promotional slider)
+- intl (implemented in helper/formatter utilities)
+
+Scanner and Warehouse Workflow
+- Scanner integration target: iData K1 handheld (planned)
+- Keyboard wedge mode first, MethodChannel fallback if needed (planned)
+- Cold storage modules in dashboard (UI scaffolded, routes/screens pending)
