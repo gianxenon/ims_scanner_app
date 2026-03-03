@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ims_scanner_app/common/widget/reusable_appbar/appbar.dart';
 import 'package:ims_scanner_app/features/authentication/data/local/auth_session_storage.dart';
 import 'package:ims_scanner_app/features/authentication/data/local/branch_selection_storage.dart';
 import 'package:ims_scanner_app/features/authentication/data/repositories/branches_repository.dart';
@@ -134,8 +135,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         : null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
+      appBar: AppReusableAppBar(
+        title: Text('Settings'),
+        showBackArrow: true,
       ),
       body: SingleChildScrollView(
         child: Padding(

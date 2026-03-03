@@ -70,4 +70,13 @@ class NetworkConfigStorage {
     if (trimmed.isEmpty) return;
     await _storage.write(key: _selectedUrlKey, value: trimmed);
   }
+
+  static Future<void> clear() async {
+    await _storage.delete(key: _endpointsKey);
+    await _storage.delete(key: _selectedUrlKey);
+  }
+
+  static Future<void> clearSelectedUrl() async {
+    await _storage.delete(key: _selectedUrlKey);
+  }
 }

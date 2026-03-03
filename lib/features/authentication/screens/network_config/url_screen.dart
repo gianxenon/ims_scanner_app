@@ -26,28 +26,28 @@ class _UrlScreenState extends State<UrlScreen> {
     final savedEndpoints = await NetworkConfigStorage.readEndpoints();
     final selectedUrl = await NetworkConfigStorage.readSelectedUrl();
 
+    final index = selectedUrl == null
+      ? -1
+      : savedEndpoints.indexWhere((endpoint) => endpoint.url == selectedUrl);
+
+    if (selectedUrl != null && index < 0) {
+      await NetworkConfigStorage.clearSelectedUrl();
+    }
+
     if (!mounted) return;
 
     setState(() {
       _endpoints
         ..clear()
         ..addAll(
-          savedEndpoints
-              .map((endpoint) => _Endpoint(title: endpoint.title, url: endpoint.url)),
+          savedEndpoints.map((e) => _Endpoint(title: e.title, url: e.url)),
         );
-
-      if (selectedUrl == null) {
-        _selectedIndex = null;
-      } else {
-        final index = _endpoints.indexWhere((endpoint) => endpoint.url == selectedUrl);
-        _selectedIndex = index >= 0 ? index : null;
-      }
-
+      _selectedIndex = index >= 0 ? index : null;
       _isBootstrapping = false;
     });
 
-    if (selectedUrl != null && selectedUrl.isNotEmpty) {
-      AppHttpClient.setBaseUrl(selectedUrl);
+    if (_selectedIndex != null) {
+        AppHttpClient.setBaseUrl(_endpoints[_selectedIndex!].url);
     }
   }
 
@@ -57,8 +57,11 @@ class _UrlScreenState extends State<UrlScreen> {
         .toList();
     await NetworkConfigStorage.saveEndpoints(endpoints);
 
-    if (_selectedIndex == null) return;
-    if (_selectedIndex! < 0 || _selectedIndex! >= _endpoints.length) return;
+    if (_selectedIndex == null || _selectedIndex! < 0 || _selectedIndex! >= _endpoints.length) {
+      await NetworkConfigStorage.clearSelectedUrl();
+      AppHttpClient.setBaseUrl('http://10.0.2.2:3000/');  
+      return;
+    }
 
     final selectedUrl = _endpoints[_selectedIndex!].url;
     await NetworkConfigStorage.saveSelectedUrl(selectedUrl);
@@ -267,6 +270,7 @@ class _UrlScreenState extends State<UrlScreen> {
     await _persistConfig();
   }
 
+  
   Future<void> _deleteEndpoint(int index) async {
     if (index < 0 || index >= _endpoints.length) return;
 
@@ -276,18 +280,16 @@ class _UrlScreenState extends State<UrlScreen> {
       _endpoints.removeAt(index);
 
       if (_endpoints.isEmpty) {
-        _selectedIndex = null;
-        return;
-      }
-
-      if (deletingSelected) {
-        _selectedIndex = 0; // auto-select first remaining endpoint
+        _selectedIndex = null; 
+      } else if (deletingSelected) {
+        _selectedIndex = 0;  
       } else if (_selectedIndex != null && _selectedIndex! > index) {
         _selectedIndex = _selectedIndex! - 1;
       }
-    });
-
-    await _persistConfig(); // remove this line if you are not persisting yet
+    });  
+  
+    await _persistConfig();  
+    
   }
 
   Future<void> _confirmDeleteEndpoint(int index) async {

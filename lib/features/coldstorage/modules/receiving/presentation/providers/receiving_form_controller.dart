@@ -1,7 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:ims_scanner_app/features/authentication/data/local/branch_selection_storage.dart';
 import 'package:ims_scanner_app/features/coldstorage/modules/receiving/domain/models/receiving_form_state.dart';
 import 'package:ims_scanner_app/features/coldstorage/modules/receiving/domain/models/receiving_scanned_item.dart';
+import 'package:ims_scanner_app/utils/logging/logger.dart';
 
 final receivingFormControllerProvider =
     StateNotifierProvider<ReceivingFormController, ReceivingFormState>(
@@ -11,73 +13,70 @@ final receivingFormControllerProvider =
 class ReceivingFormController extends StateNotifier<ReceivingFormState> {
   ReceivingFormController() : super(const ReceivingFormState());
 
-  void updateSupplierCode(String value) {
-    state = state.copyWith(
-      supplierCode: value,
-      clearFormError: true,
-    );
+  void _setError(String message) {
+    state = state.copyWith(formError: message);
   }
 
-  void updateDeliveryNo(String value) {
-    state = state.copyWith(
-      deliveryNo: value,
-      clearFormError: true,
-    );
+  bool _hasEmptyRequired(List<String> values) {
+    return values.any((value) => value.trim().isEmpty);
   }
 
-  void updatePalletTag(String value) {
-    state = state.copyWith(
-      palletTag: value,
-      clearFormError: true,
-    );
-  }
+  void addItem({
+    required String seriesName,
+    required String custNo,
+    required String roomType,
+    required String receiveCategory,
+    required String custName,
+    required String palletAddress,
+    required String batch,
+    required DateTime selectedDate,
+    required String qrCode,
+  }) {
+    final cleanSeriesName = seriesName.trim();
+    final cleanCustNo = custNo.trim();
+    final cleanRoomType = roomType.trim();
+    final cleanReceiveCategory = receiveCategory.trim();
+    final cleanCustName = custName.trim();
+    final cleanPalletAddress = palletAddress.trim();
+    final cleanBatch = batch.trim();
+    final cleanQr = qrCode.trim();
 
-  void updateBarcodeInput(String value) {
-    state = state.copyWith(
-      barcodeInput: value,
-      clearFormError: true,
-    );
-  }
-
-  void updateQuantityInput(String value) {
-    state = state.copyWith(
-      quantityInput: value,
-      clearFormError: true,
-    );
-  }
-
-  void updateRemarks(String value) {
-    state = state.copyWith(
-      remarks: value,
-      clearFormError: true,
-    );
-  }
-
-  void addCurrentScan() {
-    final barcode = state.barcodeInput.trim();
-    if (barcode.isEmpty) {
-      state = state.copyWith(formError: 'Scan barcode is required.');
+    if (_hasEmptyRequired(<String>[
+      cleanSeriesName,
+      cleanCustNo,
+      cleanRoomType,
+      cleanReceiveCategory,
+      cleanCustName,
+      cleanPalletAddress,
+      cleanBatch,
+      cleanQr,
+    ])) {
+      _setError('Please complete all required fields before adding.');
       return;
     }
 
-    final qty = int.tryParse(state.quantityInput.trim()) ?? 0;
-    if (qty <= 0) {
-      state = state.copyWith(formError: 'Quantity must be greater than 0.');
-      return;
-    }
-
+    final now = DateTime.now();
     final item = ReceivingScannedItem(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
-      barcode: barcode,
-      qty: qty,
-      createdAt: DateTime.now(),
+      id: now.microsecondsSinceEpoch.toString(),
+      seriesName: cleanSeriesName,
+      custNo: cleanCustNo,
+      roomType: cleanRoomType,
+      receiveCategory: cleanReceiveCategory,
+      custName: cleanCustName,
+      palletAddress: cleanPalletAddress,
+      batch: cleanBatch,
+      selectedDate: selectedDate,
+      qrCode: cleanQr,
+      createdAt: now,
     );
 
     state = state.copyWith(
       scannedItems: <ReceivingScannedItem>[...state.scannedItems, item],
-      barcodeInput: '',
-      quantityInput: '1',
       clearFormError: true,
+    );
+
+    AppLoggerHelper.info(
+      '[ReceivingScan] controller saved qr="$cleanQr" total=${state.scannedItems.length}',
     );
   }
 
@@ -96,19 +95,42 @@ class ReceivingFormController extends StateNotifier<ReceivingFormState> {
     state = state.copyWith(clearFormError: true);
   }
 
+  Map<String, dynamic> buildPayload({
+    required String company,
+    required String branch,
+  }) {
+    return <String, dynamic>{
+      'company': company.trim(),
+      'branch': branch.trim(),
+      'receiving': state.scannedItems.map((item) => item.toJson()).toList(),
+    };
+  }
+
   Future<bool> submit() async {
+    final selectedBranch = await BranchSelectionStorage.readSelectedBranch();
+    final company = selectedBranch?.companyCode.trim() ?? '';
+    final branch = selectedBranch?.branchCode.trim() ?? '';
+
+    if (company.isEmpty || branch.isEmpty) {
+      _setError('Please select a valid branch in Settings first.');
+      return false;
+    }
+
     if (!state.canSubmit) {
-      state = state.copyWith(
-        formError:
-            'Please complete required fields and add at least one scanned item.',
-      );
+      _setError('Please add at least one receiving line before submit.');
       return false;
     }
 
     state = state.copyWith(isSubmitting: true, clearFormError: true);
     try {
-      // TODO: connect repository/API and local queue here.
+      final payload = buildPayload(company: company, branch: branch);
+
+      // TODO: connect repository/API call here.
+      debugPrint('Receiving payload: $payload');
       return true;
+    } catch (_) {
+      _setError('Failed to submit receiving payload.');
+      return false;
     } finally {
       state = state.copyWith(isSubmitting: false);
     }

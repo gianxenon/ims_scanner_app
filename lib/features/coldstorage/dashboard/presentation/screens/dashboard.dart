@@ -42,14 +42,14 @@ class Dashboard extends ConsumerWidget {
             final item = modules[index];
 
             return InkWell(
-              onTap: () => context.go(item["route"] as String),
+              onTap: () => context.push(item["route"] as String),
               borderRadius: BorderRadius.circular(20),
               child: Container(
                 decoration: BoxDecoration(
                   color: cs.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: cs.outline.withValues(alpha: 0.2),
+                    color: cs.outline.withValues(alpha: 0.2),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
                   ),
                 ),
                 child: Column(

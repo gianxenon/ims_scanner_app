@@ -43,7 +43,7 @@ class AuthRepository {
     final res = await AppHttpClient.dio.get('api/auth/me');
     final data = _asMap(res.data);
     final user = _asMap(data['user']);
-
+      logger.d('GET ${res.realUri} -> ${res.statusCode}, response: ${res.data}');
     if (res.statusCode != 200 || user.isEmpty) {
       final message = data['message']?.toString() ?? 'Unauthorized';
       throw Exception(message);
