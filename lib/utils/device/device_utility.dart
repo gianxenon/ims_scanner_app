@@ -19,13 +19,11 @@ class AppDeviceUtils {
    }
 
    static bool isLandScapeOrientation(BuildContext context) {
-      final viewInsets = View.of(context).viewInsets;
-      return viewInsets.bottom  == 0;
+      return MediaQuery.of(context).orientation == Orientation.landscape;
    }
 
    static bool isPortraitOrientation(BuildContext context) {
-      final viewInsets = View.of(context).viewInsets;
-      return viewInsets.bottom != 0;
+      return MediaQuery.of(context).orientation == Orientation.portrait;
    }
   
    static void setFullScreen(bool enable) {
@@ -61,13 +59,15 @@ class AppDeviceUtils {
       return viewInsets.bottom;
    }
 
-   static Future<bool> isKeyboardVisible(BuildContext context) async {
+   static Future<bool> isKeyboardVisible(BuildContext context) {
       final viewInsets = View.of(context).viewInsets;
-      return viewInsets.bottom != 0;
+      return Future.value(viewInsets.bottom != 0);
    }
 
-   static Future<bool> isPhysicalDevice() async {
-      return defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
+   static Future<bool> isPhysicalDevice() {
+      return Future.value(
+          defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
    }
 
    static void vibrate(Duration duration) {

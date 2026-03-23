@@ -219,7 +219,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         if (_isLoading)
           Positioned.fill(
             child: ColoredBox(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: Colors.black.withOpacity(0.2),
               child: Center(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

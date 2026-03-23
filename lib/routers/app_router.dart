@@ -5,6 +5,7 @@ import 'package:ims_scanner_app/features/authentication/presentation/providers/a
 import 'package:ims_scanner_app/features/authentication/screens/login/login.dart';
 import 'package:ims_scanner_app/features/authentication/screens/network_config/url_screen.dart';
 import 'package:ims_scanner_app/features/authentication/presentation/providers/auth_state.dart';
+import 'package:ims_scanner_app/features/authentication/screens/splash/splash.dart';
 import 'package:ims_scanner_app/features/authentication/screens/settings/settings.dart';
 import 'package:ims_scanner_app/features/coldstorage/dashboard/presentation/screens/dashboard.dart';
 import 'package:ims_scanner_app/features/coldstorage/modules/receiving/presentation/screens/receiving_screen.dart';
@@ -20,19 +21,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   }); 
   return GoRouter(
     refreshListenable: refresh,
-    initialLocation: AppRoutePaths.login,
+    initialLocation: AppRoutePaths.splash,
     redirect: (context, state) {
       final auth = ref.read(authControllerProvider);
       final path = state.matchedLocation;
       final isLogin = path == AppRoutePaths.login;
       final isNetwork = path == AppRoutePaths.networkConfig;
+      final isSplash = path == AppRoutePaths.splash;
 
       if (auth.status == AuthStatus.loading) return null;
-      if (!auth.isAuthenticated && !isLogin && !isNetwork) return AppRoutePaths.login;
-      if (auth.isAuthenticated && isLogin) return AppRoutePaths.home;
+      if (!auth.isAuthenticated) {
+        if (isLogin || isNetwork) return null;
+        return AppRoutePaths.login;
+      }
+      if (auth.isAuthenticated && (isLogin || isSplash)) return AppRoutePaths.home;
       return null;
     },
         routes: [ 
+            GoRoute(
+              path: AppRoutePaths.splash,
+              builder: (context, state) => const SplashScreen(),
+            ),
             GoRoute(
               path: AppRoutePaths.login,
               builder: (context, state) => LoginScreen(),

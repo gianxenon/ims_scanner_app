@@ -20,14 +20,14 @@ class AppPrimaryHeaderWidget extends StatelessWidget {
                 top: -150,
                 right: -250,
                 child: AppCircularContainer(
-                  backgroundColor: cs.onSurface.withValues(alpha: 0.10),
+                  backgroundColor: cs.onSurface.withOpacity(0.10),
                 ),
               ),
               Positioned(
                 top: 100,
                 right: -300,
                 child: AppCircularContainer(
-                  backgroundColor: cs.onSurface.withValues(alpha: 0.10),
+                  backgroundColor: cs.onSurface.withOpacity(0.10),
                 ),
               ),
               child,

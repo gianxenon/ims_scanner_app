@@ -3,8 +3,11 @@ import 'package:ims_scanner_app/features/coldstorage/modules/receiving/domain/mo
 class ReceivingLookupFallbackValues {
   ReceivingLookupFallbackValues._();
 
-  static const List<String> seriesNames = <String>[
-    'CS Receive',
+  static const List<ReceivingSeriesOption> seriesNames = <ReceivingSeriesOption>[
+    ReceivingSeriesOption(
+      code: 'CS_RECEIVING',
+      name: 'CS Receive',
+    ),
   ];
 
   static const List<ReceivingCustomerOption> customers = <ReceivingCustomerOption>[

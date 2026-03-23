@@ -29,5 +29,5 @@ class AuthState {
     );
   }
 
-  static const initial = AuthState(status: AuthStatus.unauthenticated);
+  static const initial = AuthState(status: AuthStatus.loading);
 }

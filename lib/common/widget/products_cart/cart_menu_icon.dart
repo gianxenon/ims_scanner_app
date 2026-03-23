@@ -22,9 +22,7 @@ class AppCartCounterIcon extends StatelessWidget {
             width: 16,
             height: 16,
             decoration: BoxDecoration(
-              color: AppColors.primaryColor.withValues(
-                alpha: 0.8,
-              ),
+              color: AppColors.primaryColor.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
             child: const Center(child: Text('2',style: TextStyle(color: AppColors.white,fontSize: 10),)),

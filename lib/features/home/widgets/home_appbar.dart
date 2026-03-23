@@ -16,7 +16,7 @@ class AppHomeAppBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(AppTextStrings.homeAppBarTitle,style: Theme.of(context).textTheme.labelMedium!.apply(color: Theme.of(context).colorScheme.onSurface),),
-          Text(AppTextStrings.homeAppBarSubTitle,style: Theme.of(context).textTheme.headlineSmall!.apply(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),),
+          Text(AppTextStrings.homeAppBarSubTitle,style: Theme.of(context).textTheme.headlineSmall!.apply(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),),
         ],
       ),
       actions: [

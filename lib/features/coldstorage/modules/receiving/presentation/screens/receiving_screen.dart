@@ -617,7 +617,7 @@ class _ReceivingScreenState extends ConsumerState<ReceivingScreen> {
     );
 
     final seriesOptions = lookups.seriesNames
-        .map((item) => LookupOption(value: item, label: item))
+        .map((item) => LookupOption(value: item.code, label: item.label))
         .toList();
 
     final customerOptions = lookups.customers

@@ -7,6 +7,7 @@ import 'package:ims_scanner_app/features/authentication/data/local/branch_select
 import 'package:ims_scanner_app/features/authentication/data/repositories/branches_repository.dart';
 import 'package:ims_scanner_app/features/authentication/domain/models/branch_option.dart';
 import 'package:ims_scanner_app/features/authentication/presentation/providers/auth_controller.dart';
+import 'package:ims_scanner_app/features/coldstorage/modules/receiving/presentation/providers/receiving_lookup_provider.dart';
 import 'package:ims_scanner_app/routers/app_route_paths.dart';
 import 'package:ims_scanner_app/utils/constants/sizes.dart'; 
 class SettingScreen extends ConsumerStatefulWidget {
@@ -63,6 +64,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
       if (selected == null && dedupedBranches.isNotEmpty) {
         selected = dedupedBranches.first;
         await BranchSelectionStorage.saveSelectedBranch(selected);
+        ref.invalidate(receivingLookupProvider);
       }
 
       if (!mounted) return;
@@ -98,6 +100,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     });
 
     await BranchSelectionStorage.saveSelectedBranch(value);
+    ref.invalidate(receivingLookupProvider);
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

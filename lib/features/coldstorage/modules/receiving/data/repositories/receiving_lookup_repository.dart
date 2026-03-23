@@ -53,18 +53,17 @@ class ReceivingLookupRepository {
       ),
     ]);
 
-    final series = _parseStringList(
+    final series = _parseSeriesOptions(
       responses[0]?.data,
-      containerKeys: const <String>['series', 'items', 'data'],
-      valueKeys: const <String>['seriesname', 'name', 'value', 'label'],
+      containerKeys: const <String>['seriesNames', 'series', 'items', 'data'],
     );
 
     final customers = _parseCustomers(responses[1]?.data);
 
     final roomTypes = _parseStringList(
       responses[2]?.data,
-      containerKeys: const <String>['roomTypes', 'rooms', 'items', 'data'],
-      valueKeys: const <String>['roomtype', 'roomType', 'name', 'value', 'label'],
+      containerKeys: const <String>['roomTypes', 'roomTypeCodes', 'rooms', 'items', 'data'],
+      valueKeys: const <String>['code', 'roomtype', 'roomType', 'name', 'value', 'label'],
     );
 
     final categories = _parseStringList(
@@ -168,6 +167,47 @@ class ReceivingLookupRepository {
             name: name,
           ),
         );
+      }
+    }
+
+    return result;
+  }
+
+  List<ReceivingSeriesOption> _parseSeriesOptions(
+    dynamic data, {
+    required List<String> containerKeys,
+  }) {
+    final rawList = _extractList(data, containerKeys);
+    if (rawList == null) return <ReceivingSeriesOption>[];
+
+    final result = <ReceivingSeriesOption>[];
+    final seen = <String>{};
+
+    for (final entry in rawList) {
+      String code = '';
+      String name = '';
+
+      if (entry is String) {
+        code = entry.trim();
+        name = entry.trim();
+      } else if (entry is Map) {
+        final map = entry.map((k, v) => MapEntry(k.toString(), v));
+        code = _pickString(
+          map,
+          const <String>['code', 'seriesCode', 'seriesname', 'value', 'id', 'name', 'label'],
+        );
+        name = _pickString(
+          map,
+          const <String>['name', 'label', 'seriesName', 'seriesname', 'value', 'code'],
+        );
+      }
+
+      if (code.isEmpty && name.isEmpty) continue;
+      if (code.isEmpty) code = name;
+      if (name.isEmpty) name = code;
+
+      if (seen.add(code)) {
+        result.add(ReceivingSeriesOption(code: code, name: name));
       }
     }
 
